@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-background: #f4f1ea;
+  --color-foreground: #1d1d1f;
+  --color-card: #fffaf2;
+  --color-card-foreground: #1d1d1f;
+  --color-primary: #166534;
+  --color-primary-foreground: #fefefe;
+  --color-muted: #d9d3c4;
+  --color-muted-foreground: #4a4a46;
+  --color-border: #c8c0af;
+  --radius: 0.9rem;
+}
+
+:root {
+  color: var(--color-foreground);
+  background:
+    radial-gradient(circle at top right, rgba(22, 101, 52, 0.16), transparent 26%),
+    linear-gradient(180deg, #faf7f0 0%, #f2ede2 100%);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+#app {
+  min-height: 100vh;
+}

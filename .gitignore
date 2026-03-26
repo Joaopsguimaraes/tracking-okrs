@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+.DS_Store
+.idea
+.vscode
+.pnpm-store
+.turbo
+.env
+.env.local
+.env.*.local
+apps/web/components.json.lock
+apps/api/.tsbuildinfo
+apps/web/.tsbuildinfo
+apps/web/vitest.config.ts.timestamp-*
+*.log
