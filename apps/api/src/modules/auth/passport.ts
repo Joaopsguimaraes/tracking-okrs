@@ -1,93 +1,117 @@
-import passport from 'passport';
+import { Passport } from 'passport';
 import type { Profile } from 'passport-github2';
 import { Strategy as GithubStrategy } from 'passport-github2';
+import type { IVerifyOptions } from 'passport-local';
 import { Strategy as LocalStrategy } from 'passport-local';
 
 import { env } from '../../config/env.js';
 import { authRepository } from './repositories/auth.repository.js';
 import { authService } from './services/auth.service.js';
+import { AuthError } from './services/auth.errors.js';
 
-type DoneCallback = (error: Error | null, user?: Express.User | false) => void;
+type DoneCallback = (
+  error: Error | null,
+  user?: Express.User | false,
+  info?: IVerifyOptions & {
+    code?: string;
+  },
+) => void;
 
-passport.use(
-  new LocalStrategy(
-    {
-      usernameField: 'email',
-      passwordField: 'password',
-    },
-    async (email: string, password: string, done: DoneCallback) => {
-      try {
-        const user = await authService.validateCredentials(email, password);
-        done(null, user ?? false);
-        return;
-      } catch (error) {
-        done(error instanceof Error ? error : new Error('Local authentication failed'));
-        return;
+type PassportDependencies = {
+  repository?: typeof authRepository;
+  service?: typeof authService;
+};
+
+const toGithubProfileInput = (profile: Profile) => ({
+  id: profile.id,
+  ...(profile.username !== undefined
+    ? {
+        username: profile.username,
       }
-    },
-  ),
-);
-
-passport.use(
-  new GithubStrategy(
-    {
-      clientID: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-      callbackURL: env.GITHUB_CALLBACK_URL,
-      scope: ['user:email'],
-    },
-    async (
-      _accessToken: string,
-      _refreshToken: string,
-      profile: Profile,
-      done: DoneCallback,
-    ) => {
-      try {
-        const primaryEmail = profile.emails?.[0]?.value ?? profile.username;
-
-        if (!primaryEmail) {
-          done(new Error('GitHub profile does not expose a usable email'));
-          return;
-        }
-
-        const existingUser = await authRepository.findUserByGithubId(profile.id);
-
-        if (existingUser) {
-          done(null, existingUser);
-          return;
-        }
-
-        const displayName =
-          profile.displayName.length > 0 ? profile.displayName : primaryEmail;
-
-        const createdUser = await authRepository.createGithubUser({
-          githubId: profile.id,
-          email: primaryEmail,
-          displayName,
-          avatarUrl: profile.photos?.[0]?.value ?? null,
-        });
-
-        done(null, createdUser);
-        return;
-      } catch (error) {
-        done(error instanceof Error ? error : new Error('GitHub authentication failed'));
-        return;
+    : {}),
+  ...(profile.displayName
+    ? {
+        displayName: profile.displayName,
       }
-    },
-  ),
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
+    : {}),
+  primaryEmail: profile.emails?.[0]?.value ?? null,
+  avatarUrl: profile.photos?.[0]?.value ?? null,
 });
 
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const user = await authRepository.findUserById(id);
-    done(null, user ?? false);
-  } catch (error) {
-    done(error);
-  }
-});
+export const createPassport = (dependencies: PassportDependencies = {}) => {
+  const repository = dependencies.repository ?? authRepository;
+  const service = dependencies.service ?? authService;
+  const passport = new Passport();
 
-export { passport };
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: 'email',
+        passwordField: 'password',
+        session: false,
+      },
+      async (email: string, password: string, done: DoneCallback) => {
+        try {
+          const user = await service.validateCredentials(email, password);
+          done(null, user);
+          return;
+        } catch (error) {
+          if (error instanceof AuthError) {
+            done(null, false, {
+              code: error.code,
+              message: error.message,
+            });
+            return;
+          }
+
+          done(error instanceof Error ? error : new Error('Local authentication failed'));
+        }
+      },
+    ),
+  );
+
+  passport.use(
+    new GithubStrategy(
+      {
+        clientID: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
+        callbackURL: env.GITHUB_CALLBACK_URL,
+        scope: ['user:email'],
+      },
+      async (_accessToken: string, _refreshToken: string, profile: Profile, done: DoneCallback) => {
+        try {
+          const user = await service.authenticateWithGithubProfile(toGithubProfileInput(profile));
+          done(null, user);
+          return;
+        } catch (error) {
+          if (error instanceof AuthError) {
+            done(null, false, {
+              code: error.code,
+              message: error.message,
+            });
+            return;
+          }
+
+          done(error instanceof Error ? error : new Error('GitHub authentication failed'));
+        }
+      },
+    ),
+  );
+
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await repository.findUserById(id);
+      done(null, user ?? false);
+    } catch (error) {
+      done(error as Error);
+    }
+  });
+
+  return passport;
+};
+
+export const passport = createPassport();

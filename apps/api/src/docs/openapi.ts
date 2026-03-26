@@ -51,6 +51,25 @@ export const openApiDocument = swaggerJsdoc({
             '200': {
               description: 'Authenticated session payload',
             },
+            '401': {
+              description: 'Invalid credentials',
+            },
+            '403': {
+              description: 'Email not verified when verification enforcement is enabled',
+            },
+          },
+        },
+      },
+      '/auth/register': {
+        post: {
+          summary: 'Register a local account',
+          responses: {
+            '201': {
+              description: 'Registration created; verification email may be sent for optional activation',
+            },
+            '409': {
+              description: 'Email or username conflict',
+            },
           },
         },
       },
@@ -70,6 +89,39 @@ export const openApiDocument = swaggerJsdoc({
           responses: {
             '302': {
               description: 'Redirect to GitHub',
+            },
+          },
+        },
+      },
+      '/auth/github/callback': {
+        get: {
+          summary: 'Finish GitHub OAuth flow',
+          responses: {
+            '302': {
+              description: 'Redirect back to the web app',
+            },
+          },
+        },
+      },
+      '/auth/verify-email': {
+        get: {
+          summary: 'Consume email verification token',
+          responses: {
+            '302': {
+              description: 'Redirect to verification result view',
+            },
+          },
+        },
+      },
+      '/auth/resend-verification': {
+        post: {
+          summary: 'Resend verification email respecting cooldown',
+          responses: {
+            '200': {
+              description: 'Verification resend availability',
+            },
+            '429': {
+              description: 'Cooldown still active',
             },
           },
         },

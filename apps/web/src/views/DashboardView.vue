@@ -1,7 +1,9 @@
 <template>
   <main class="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10">
     <section class="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-      <div class="rounded-[calc(var(--radius)*1.4)] border border-[var(--color-border)] bg-[var(--color-card)] p-8">
+      <div
+        class="rounded-[calc(var(--radius)*1.4)] border border-[var(--color-border)] bg-[var(--color-card)] p-8"
+      >
         <p class="text-sm uppercase tracking-[0.24em] text-[var(--color-muted-foreground)]">
           Quarter snapshot
         </p>
@@ -16,12 +18,14 @@
           <AppButton>Configure first quarter</AppButton>
           <span class="text-sm text-[var(--color-muted-foreground)]">
             Session:
-            {{ sessionStore.user?.displayName ?? 'not authenticated yet' }}
+            {{ sessionStore.user?.name ?? 'not authenticated yet' }}
           </span>
         </div>
       </div>
 
-      <div class="rounded-[calc(var(--radius)*1.4)] border border-[var(--color-border)] bg-[#204229] p-8 text-white">
+      <div
+        class="rounded-[calc(var(--radius)*1.4)] border border-[var(--color-border)] bg-[#204229] p-8 text-white"
+      >
         <p class="text-sm uppercase tracking-[0.24em] text-white/70">
           Current completion
         </p>
@@ -36,7 +40,9 @@
 
     <section class="grid gap-6 lg:grid-cols-[1fr_1fr]">
       <ProgressChart :progress-percentage="overallProgress" />
-      <div class="rounded-[var(--radius)] border border-dashed border-[var(--color-border)] bg-white/60 p-6">
+      <div
+        class="rounded-[var(--radius)] border border-dashed border-[var(--color-border)] bg-white/60 p-6"
+      >
         <h2 class="text-lg font-semibold">
           MVVM folders are in place
         </h2>

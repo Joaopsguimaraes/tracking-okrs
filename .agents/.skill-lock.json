@@ -7,9 +7,7 @@
       "contentHash": "2abba650ba22a819e67f8c2fb09d0f5f33a24d66d945ee2ef824751bc97151ce",
       "installedAt": "2026-03-26T14:02:29.582Z",
       "updatedAt": "2026-03-26T14:02:29.592Z",
-      "agents": [
-        "windsurf"
-      ],
+      "agents": ["windsurf"],
       "method": "copy",
       "global": false
     },
@@ -19,9 +17,7 @@
       "contentHash": "8af5bd3453984bdcef903709b6ef0606b12ae1badb6dd5b5b382b930d2594d7c",
       "installedAt": "2026-03-26T14:03:01.632Z",
       "updatedAt": "2026-03-26T14:03:01.643Z",
-      "agents": [
-        "windsurf"
-      ],
+      "agents": ["windsurf"],
       "method": "copy",
       "global": false
     }

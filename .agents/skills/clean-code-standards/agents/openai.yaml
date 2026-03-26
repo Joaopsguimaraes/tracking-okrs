@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Clean Code Standards'
+  short_description: 'SRP, DRY, KISS code-quality guardrails'
+  default_prompt: 'Use $clean-code-standards to review this code for SRP, DRY, KISS, file size, function length, and complexity issues.'

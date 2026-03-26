@@ -123,26 +123,26 @@ npm ls lodash
 
 ```javascript
 // ❌ Prototype pollution vulnerable patterns
-Object.assign(target, userInput)
-_.merge(target, userInput)
+Object.assign(target, userInput);
+_.merge(target, userInput);
 
 // ✅ Safer alternatives
-const safeData = JSON.parse(JSON.stringify(userInput))
+const safeData = JSON.parse(JSON.stringify(userInput));
 ```
 
 ### Input sanitization
 
 ```javascript
 // ❌ XSS vulnerable
-element.innerHTML = userInput
-document.write(userInput)
+element.innerHTML = userInput;
+document.write(userInput);
 
 // ✅ Safe text content
-element.textContent = userInput
+element.textContent = userInput;
 
 // ✅ If HTML needed, sanitize
-import DOMPurify from 'dompurify'
-element.innerHTML = DOMPurify.sanitize(userInput)
+import DOMPurify from 'dompurify';
+element.innerHTML = DOMPurify.sanitize(userInput);
 ```
 
 ### Secure cookies
@@ -243,7 +243,7 @@ if ('IntersectionObserver' in window) {
 <!-- Load polyfills conditionally -->
 <script>
   if (!('fetch' in window)) {
-    document.write('<script src="/polyfills/fetch.js"><\/script>')
+    document.write('<script src="/polyfills/fetch.js"><\/script>');
   }
 </script>
 
@@ -286,15 +286,15 @@ if ('serviceWorker' in navigator) {
 
 ```javascript
 // ❌ Non-passive touch/wheel (may block scrolling)
-element.addEventListener('touchstart', handler)
-element.addEventListener('wheel', handler)
+element.addEventListener('touchstart', handler);
+element.addEventListener('wheel', handler);
 
 // ✅ Passive listeners (allows smooth scrolling)
-element.addEventListener('touchstart', handler, { passive: true })
-element.addEventListener('wheel', handler, { passive: true })
+element.addEventListener('touchstart', handler, { passive: true });
+element.addEventListener('wheel', handler, { passive: true });
 
 // ✅ If you need preventDefault, be explicit
-element.addEventListener('touchstart', handler, { passive: false })
+element.addEventListener('touchstart', handler, { passive: false });
 ```
 
 ---
@@ -305,17 +305,17 @@ element.addEventListener('touchstart', handler, { passive: false })
 
 ```javascript
 // ❌ Errors in production
-console.log('Debug info') // Remove in production
-throw new Error('Unhandled') // Catch all errors
+console.log('Debug info'); // Remove in production
+throw new Error('Unhandled'); // Catch all errors
 
 // ✅ Proper error handling
 try {
-  riskyOperation()
+  riskyOperation();
 } catch (error) {
   // Log to error tracking service
-  errorTracker.captureException(error)
+  errorTracker.captureException(error);
   // Show user-friendly message
-  showErrorMessage('Something went wrong. Please try again.')
+  showErrorMessage('Something went wrong. Please try again.');
 }
 ```
 
@@ -323,28 +323,28 @@ try {
 
 ```jsx
 class ErrorBoundary extends React.Component {
-  state = { hasError: false }
+  state = { hasError: false };
 
   static getDerivedStateFromError(error) {
-    return { hasError: true }
+    return { hasError: true };
   }
 
   componentDidCatch(error, info) {
-    errorTracker.captureException(error, { extra: info })
+    errorTracker.captureException(error, { extra: info });
   }
 
   render() {
     if (this.state.hasError) {
-      return <FallbackUI />
+      return <FallbackUI />;
     }
-    return this.props.children
+    return this.props.children;
   }
 }
 
 // Usage
-;<ErrorBoundary>
+<ErrorBoundary>
   <App />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 ### Global error handler
@@ -352,13 +352,13 @@ class ErrorBoundary extends React.Component {
 ```javascript
 // Catch unhandled errors
 window.addEventListener('error', (event) => {
-  errorTracker.captureException(event.error)
-})
+  errorTracker.captureException(event.error);
+});
 
 // Catch unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
-  errorTracker.captureException(event.reason)
-})
+  errorTracker.captureException(event.reason);
+});
 ```
 
 ---
@@ -372,17 +372,17 @@ window.addEventListener('unhandledrejection', (event) => {
 // webpack.config.js
 module.exports = {
   devtool: 'source-map', // Exposes source code
-}
+};
 
 // ✅ Hidden source maps (uploaded to error tracker)
 module.exports = {
   devtool: 'hidden-source-map',
-}
+};
 
 // ✅ Or no source maps in production
 module.exports = {
   devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
-}
+};
 ```
 
 ---
@@ -411,15 +411,15 @@ module.exports = {
 ```javascript
 // ❌ Handler on every element
 items.forEach((item) => {
-  item.addEventListener('click', handleClick)
-})
+  item.addEventListener('click', handleClick);
+});
 
 // ✅ Event delegation
 container.addEventListener('click', (e) => {
   if (e.target.matches('.item')) {
-    handleClick(e)
+    handleClick(e);
   }
-})
+});
 ```
 
 ### Memory management
@@ -428,24 +428,24 @@ container.addEventListener('click', (e) => {
 // ❌ Memory leak (never removed)
 const handler = () => {
   /* ... */
-}
-window.addEventListener('resize', handler)
+};
+window.addEventListener('resize', handler);
 
 // ✅ Cleanup when done
 const handler = () => {
   /* ... */
-}
-window.addEventListener('resize', handler)
+};
+window.addEventListener('resize', handler);
 
 // Later, when component unmounts:
-window.removeEventListener('resize', handler)
+window.removeEventListener('resize', handler);
 
 // ✅ Using AbortController
-const controller = new AbortController()
-window.addEventListener('resize', handler, { signal: controller.signal })
+const controller = new AbortController();
+window.addEventListener('resize', handler, { signal: controller.signal });
 
 // Cleanup:
-controller.abort()
+controller.abort();
 ```
 
 ---
@@ -531,15 +531,15 @@ controller.abort()
 
 ```javascript
 // ❌ Request on page load (bad UX, often denied)
-navigator.geolocation.getCurrentPosition(success, error)
+navigator.geolocation.getCurrentPosition(success, error);
 
 // ✅ Request in context, after user action
 findNearbyButton.addEventListener('click', async () => {
   // Explain why you need it
   if (await showPermissionExplanation()) {
-    navigator.geolocation.getCurrentPosition(success, error)
+    navigator.geolocation.getCurrentPosition(success, error);
   }
-})
+});
 ```
 
 ### Permissions policy
