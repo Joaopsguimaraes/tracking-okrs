@@ -11,6 +11,8 @@ coverage
 .env.*.local
 apps/web/components.json.lock
 apps/api/.tsbuildinfo
+apps/api/.env
+apps/web/.env
 apps/web/.tsbuildinfo
 apps/web/vitest.config.ts.timestamp-*
 *.log
